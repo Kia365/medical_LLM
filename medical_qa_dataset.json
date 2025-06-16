@@ -1,0 +1,14 @@
+[
+    {
+        "question": "What are the common symptoms of diabetes?",
+        "answer": "Common symptoms of diabetes include increased thirst, frequent urination, extreme hunger, unexplained weight loss, fatigue, blurred vision, and slow-healing sores. Type 1 diabetes symptoms can develop quickly, while Type 2 diabetes symptoms often develop more slowly."
+    },
+    {
+        "question": "How do you interpret a chest X-ray for pneumonia?",
+        "answer": "When interpreting a chest X-ray for pneumonia, look for: 1) Areas of increased opacity or white patches (consolidation), 2) Air bronchograms, 3) Silhouette signs, 4) Pleural effusion. The location and pattern of these findings can help determine the type of pneumonia and guide treatment."
+    },
+    {
+        "question": "What are the key differences between MRI and CT scans?",
+        "answer": "MRI uses magnetic fields and radio waves to create detailed images of soft tissues, while CT scans use X-rays to create cross-sectional images. MRI is better for soft tissue imaging and doesn't use radiation, but takes longer and is more expensive. CT scans are faster, better for bone imaging, but expose patients to radiation."
+    }
+] 
