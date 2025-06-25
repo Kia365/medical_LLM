@@ -9,6 +9,32 @@ import io
 import base64
 import os
 from typing import Optional
+import huggingface_hub
+from huggingface_hub import HfFolder
+import time
+
+# Configure Hugging Face Hub settings
+huggingface_hub.constants.HF_HUB_DOWNLOAD_TIMEOUT = 300  # 5 minutes timeout
+huggingface_hub.constants.HF_HUB_ENABLE_HF_TRANSFER = False
+
+# Set environment variable for HF mirror (optional, uncomment if needed)
+# os.environ['HF_ENDPOINT'] = 'https://hf-mirror.com'
+
+def download_with_retry(model_id, max_retries=3, retry_delay=10):
+    """Download model with retry logic"""
+    for attempt in range(max_retries):
+        try:
+            return AutoModelForCausalLM.from_pretrained(
+                model_id,
+                torch_dtype=torch.float16
+            )
+        except Exception as e:
+            if attempt == max_retries - 1:
+                raise e
+            print(f"Download attempt {attempt + 1} failed: {str(e)}")
+            print(f"Retrying in {retry_delay} seconds...")
+            time.sleep(retry_delay)
+            retry_delay *= 2  # Exponential backoff
 
 app = FastAPI(title="Medical Assistant API")
 
@@ -54,19 +80,20 @@ try:
         print(f"Loading model from {MODEL_PATH}")
         # Load the base model first
         print("Loading base model...")
-        base_model = AutoModelForCausalLM.from_pretrained(
-            BASE_MODEL,
-            torch_dtype=torch.float16,
-            device_map="auto"
-        )
+        base_model = download_with_retry(BASE_MODEL)
         
         # Load the PEFT adapter
         print("Loading PEFT adapter...")
         model = PeftModel.from_pretrained(base_model, MODEL_PATH)
         
-        # Load tokenizer
+        # Load tokenizer from base model to avoid compatibility issues
         print("Loading tokenizer...")
-        tokenizer = AutoTokenizer.from_pretrained(MODEL_PATH)
+        tokenizer = AutoTokenizer.from_pretrained(BASE_MODEL)
+        
+        # Move model to appropriate device
+        device = "cuda" if torch.cuda.is_available() else "cpu"
+        model = model.to(device)
+        print(f"Model moved to {device}")
         
         print("Model loaded successfully!")
     else:
